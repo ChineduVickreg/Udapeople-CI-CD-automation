@@ -45,7 +45,7 @@ jobs:
       - restore_cache:
           keys: [test-frontend]
       - run:
-          name: Run frontent test
+          name: Run frontend test
           command:
       # Your job code here
               cd frontend
