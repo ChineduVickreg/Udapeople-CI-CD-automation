@@ -43,9 +43,9 @@ jobs:
     steps:
       - checkout:
       - restore_cache:
-          keys: [frontend-build]
+          keys: [build-frontend]
       - run:
-          name: Run frontend test
+          name: "Run frontend test"
           command:
       # Your job code here
               cd frontend
@@ -58,9 +58,9 @@ jobs:
     steps:
       - checkout:
       - restore_cache:
-          keys: [backend-build]
+          keys: [build-backend]
       - run:
-          name: Run backend test
+          name: "Run backend test"
           command:
       # Your job code here
               cd backend
