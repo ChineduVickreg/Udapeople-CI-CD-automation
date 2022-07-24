@@ -45,7 +45,7 @@ jobs:
       - restore_cache:
           keys: [frontend-build]
       - run:
-          name: "Test Frontent"
+          name: Run frontent test
           command:
       # Your job code here
               cd frontend
@@ -60,7 +60,7 @@ jobs:
       - restore_cache:
           keys: [backend-build]
       - run:
-          name: "Test Backend"
+          name: Run backend test
           command:
       # Your job code here
               cd backend
