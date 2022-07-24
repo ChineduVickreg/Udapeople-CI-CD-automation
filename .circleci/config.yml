@@ -41,9 +41,9 @@ jobs:
     docker:
       - image: circleci/node:13.8.0
     steps:
-      - checkout:
+      - checkout
       - restore_cache:
-          keys: [build-frontend]
+          keys: [test-frontend]
       - run:
           name: "Run frontend test"
           command:
@@ -56,9 +56,9 @@ jobs:
     docker:
       - image: circleci/node:13.8.0 
     steps:
-      - checkout:
+      - checkout
       - restore_cache:
-          keys: [build-backend]
+          keys: [test-backend]
       - run:
           name: "Run backend test"
           command:
