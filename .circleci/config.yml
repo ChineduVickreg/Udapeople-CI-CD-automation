@@ -71,9 +71,9 @@ jobs:
     steps:
       -checkout
       -restore_cache:
-          keys: [frontend-build]
+         keys: [frontend-build]
       -run:
-        name: "Analyze frontend"
+        name: Analyze frontend
         command: |
             cd frontend
             npm install
@@ -86,9 +86,9 @@ jobs:
     steps:
       -checkout
       -restore_cache:
-          keys:[backend-build]
+         keys:[backend-build]
       -run:
-        name: "Analyze backend"
+        name: Analyze backend
         command: |
             cd backend
             npm install
