@@ -70,11 +70,9 @@ jobs:
       - image: circleci/node:13.8.0 
     steps: 
       - checkout 
-      - attach_workspace: 
-            at: ~/
       - restore_cache:
           keys: [frontend-build]
-      -run:
+      - run:
         name: Analyze frontend
         command: |
             cd frontend
