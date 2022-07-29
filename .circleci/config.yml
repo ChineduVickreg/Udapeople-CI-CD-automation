@@ -104,7 +104,7 @@ jobs:
           name: install tar and gzip dependencies
           command: |
             yum install -y tar gzip
-           # yum update -y
+            yum update -y
       - run:
           name: Ensure back-end infrastructure exists
           command: |
