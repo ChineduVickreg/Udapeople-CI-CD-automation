@@ -132,8 +132,37 @@ jobs:
       - persist_to_workspace:
          root: ~/
          paths: 
-              - project/.circleci/ansible/inventory.txt
+             - project/.circleci/ansible/inventory.txt
       #- destroy-environment
+
+  configure-infrastructure:
+    docker: 
+      - image: python:3.7-alpine3.11
+      # Docker image here that supports Ansible
+      
+    steps:
+      
+      
+      
+      - checkout 
+      - add_ssh_keys:
+          fingerprints: ["60:92:be:51:c0:3f:1a:c3:5b:64:fa:09:fb:da:77:40"]
+      - attach_workspace:
+          at: ~/
+      
+      - run:
+          name: Install dependencies
+          command: |
+                    apk add tar gzip ansible nodejs
+                    pip install --upgrade pip
+                    pip install awscli
+            
+      - run:
+          name: Configure server
+          command: |
+            cd .circleci/ansible
+            ansible-playbook -i inventory.txt configure-server.yml
+      # Here's where you will add some code to rollback on failure 
      
 workflows:
   default:
@@ -149,7 +178,9 @@ workflows:
       - scan-frontend:
             requires: [build-frontend]
       - deploy-infrastructure: 
-            requires: [test-frontend, test-backend, scan-frontend, scan-backend]      
+            requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+      - configure-infrastructure:
+            requires: [deploy-infrastructure]           
 
 
 
