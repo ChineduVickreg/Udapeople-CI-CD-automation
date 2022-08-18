@@ -264,7 +264,7 @@ jobs:
             - destroy-environment
             - revert-migrations
             #TODO: provide this S3 bucket url
-    deploy-backend:
+  deploy-backend:
         docker:
             - image: python:3.7-alpine3.11
         steps:
