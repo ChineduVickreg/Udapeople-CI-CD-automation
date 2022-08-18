@@ -183,17 +183,18 @@ jobs:
       - checkout 
       - add_ssh_keys:
           fingerprints: ["60:92:be:51:c0:3f:1a:c3:5b:64:fa:09:fb:da:77:40"]
-      - attach_workspace:
-          at: ~/
       - run:
           name: Install dependencies
           command: |
-                    apk add tar gzip ansible nodejs
-                    pip install --upgrade pip
-                    pip install awscli
+                apk add tar gzip ansible nodejs
+                pip install --upgrade pip
+                pip install awscli    
+      - attach_workspace:
+          at: ~/
       - run:
           name: Configure server
           command: |
+            pwd
             cd .circleci/ansible
             ansible-playbook -i inventory.txt configure-server.yml
       # Here's where you will add some code to rollback on failure 
