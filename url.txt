@@ -1,0 +1,5 @@
+URL01 (Github Url): https://github.com/ChineduVickreg/Udapeople-CI-CD-automation  
+
+URL02 (Green s3 bucket url): https://s3.console.aws.amazon.com/s3/buckets/udapeople-54acc49?region=us-east-1&tab=objects
+
+Cloudfront Domain name: djvulngolm07b.cloudfront.net
