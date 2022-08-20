@@ -237,7 +237,7 @@ jobs:
                     yum install python3 -y
                     yum install gzip tar curl -y
                     curl --silent --location https://rpm.nodesource.com/setup_16.x | bash -
-                    yum install -y nodejs
+                    yum install -y nodejs-16.16.0-1nodesource
             - attach_workspace:
                 at: ~/
             - run:
