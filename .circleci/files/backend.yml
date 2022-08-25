@@ -39,10 +39,10 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub backend-${ID}
-  MyEIP:
-    Type: AWS::EC2::EIP
-    Properties:
-      InstanceId: !Ref EC2Instance
-      Tags:
-        - Key: Name
-          Value: udagramBackendEIP
+  # MyEIP:
+  #   Type: AWS::EC2::EIP
+  #   Properties:
+  #     InstanceId: !Ref EC2Instance
+  #     Tags:
+  #       - Key: Name
+  #         Value: udagramBackendEIP
