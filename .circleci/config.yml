@@ -367,16 +367,32 @@ jobs:
       - destroy-environment
       - revert-migrations
   smoke-test:
+    # docker:
+    #   - image: python:3.7-alpine3.11
+    # steps:
+    #   - checkout
+    #   - run:
+    #       name: Install dependencies
+    #       command: |
+    #         apk add tar gzip ansible nodejs curl
+    #         apk add --update npm
+    #         pip install awscli
     docker:
-      - image: python:3.7-alpine3.11
+      - image: cimg/base:stable
     steps:
       - checkout
       - run:
-          name: Install dependencies
+          name: Install NodeJs
           command: |
-            apk add tar gzip ansible nodejs curl
-            apk add --update npm
-            pip install awscli
+            curl -fsSL https://deb.nodesource.com/setup_13.x | sudo -E bash -
+            sudo apt install -y nodejs
+      - run:
+          name: Install AWS CLI
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install  
+      - run:
       - attach_workspace:
           at: ~/
       - run:
@@ -399,7 +415,7 @@ jobs:
           name: Backend smoke test
           command: |
             export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --filters "Name=tag:aws:cloudformation:stack-name,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
+              --filters "Name=tag:Name,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
             export API_URL=http://${BACKEND_IP}:3030
             echo BACKEND_IP: ${BACKEND_IP}
             echo ${API_URL}
