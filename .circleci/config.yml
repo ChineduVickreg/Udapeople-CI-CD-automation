@@ -392,7 +392,7 @@ jobs:
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
             sudo ./aws/install  
-      - run:
+    #   - run:
     #   - attach_workspace:
     #       at: ~/
     #   - run:
@@ -422,9 +422,9 @@ jobs:
             echo ${CIRCLE_WORKFLOW_ID:0:7}
             if curl -s ${API_URL}/api/status | grep "ok"
             then
-              exit 0
+               exit 0
             else
-              exit 1
+               exit 1
             fi
       - run:
           name: Frontend smoke test.
