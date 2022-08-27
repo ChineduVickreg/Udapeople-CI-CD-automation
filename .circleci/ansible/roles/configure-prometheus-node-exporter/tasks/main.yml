@@ -30,32 +30,29 @@
 #     systemctl enable node-exporter
 #     systemctl start node-exporter
 #     systemctl status node-exporter
----
-- name: 'update and upgrade packages.' # sudo apt upgrade
-  become: true
-  apt:
-    upgrade: yes
-    update_cache: yes
-    cache_valid_time: 86400
-    
-- name: remove unneeded dependencies
-  become: true
-  apt:
-    autoremove: yes
-- name: "Install NodeJs 13"
-  become: true
-  apt:
-    name: ["nodejs", "npm"]
-    state: latest
-    update_cache: yes
+- name: "install node exporter."
+  unarchive:
+    src: https://github.com/prometheus/node_exporter/releases/download/v0.17.0/node_exporter-0.17.0.linux-amd64.tar.gz
+    dest: /tmp
+    remote_src: yes
 
-- name: "Install PM2 Globally"
-  become: true
-  npm:
-    name: pm2
-    global: yes
-- name: "move enviroment variables to /etc/profile.d/"
+- name: "move binary to /usr/local/bin."
   become: true
   copy:
-    src: myenv.sh
-    dest: /etc/profile.d
+    src: /tmp/node_exporter-0.17.0.linux-amd64/node_exporter
+    dest: /usr/local/bin/node_exporter
+    remote_src: yes
+    mode: '0777'
+- name: "add node exporter configuration."
+  become: true
+  copy:
+    src: node_exporter.service
+    dest: /etc/systemd/system/
+
+- name: "enable node_exporter service"
+  become: true
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: node_exporter
+    enabled: yes
