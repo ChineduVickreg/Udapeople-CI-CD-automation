@@ -324,7 +324,7 @@ jobs:
             #TODO: provide this S3 bucket url
   deploy-backend:
     docker:
-      - image: python:3.7-alpine3.11
+      - image: cimg/base:stable
     steps:
       - checkout
       - add_ssh_keys:
