@@ -249,40 +249,95 @@ jobs:
             fi
       - destroy-environment
       - revert-migrations  
+  # deploy-frontend:
+  #   docker:
+  #     - image: amazon/aws-cli
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: Install dependencies
+  #         command: |
+  #           yum install python3 -y
+  #           yum install gzip tar curl -y
+  #           curl --silent --location https://rpm.nodesource.com/setup_16.x | bash -
+  #           yum install -y nodejs-16.16.0-1nodesource
+  #     - attach_workspace:
+  #         at: ~/
+  #     - run:
+  #         name: Get backend url
+  #         command: |
+  #           export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' \
+  #             --filters "Name=tag:project,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
+  #           export API_URL="http://${BACKEND_IP}:3030"
+  #           echo "API_URL = ${API_URL}"
+  #           echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+  #           cat frontend/.env
+  #     - run:
+  #         name: Deploy frontend objects
+  #         command: |
+  #           cd frontend
+  #           npm install
+  #           npm run build
+  #           # tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+  #           aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+  #     - destroy-environment
+  #     - revert-migrations
+            #TODO: provide this S3 bucket url
   deploy-frontend:
     docker:
-      - image: amazon/aws-cli
+      # Docker image here that supports AWS CLI
+       - image: cimg/base:stable
     steps:
+      # Checkout code from git
       - checkout
-      - run:
-          name: Install dependencies
-          command: |
-            yum install python3 -y
-            yum install gzip tar curl -y
-            curl --silent --location https://rpm.nodesource.com/setup_16.x | bash -
-            yum install -y nodejs-16.16.0-1nodesource
+      # Add ssh keys with fingerprint
+      - add_ssh_keys:
+          fingerprints:
+            - "a0:3e:96:fb:34:7d:4e:65:a7:5a:86:ee:1a:7e:2f:84"
       - attach_workspace:
           at: ~/
       - run:
+          name: Install NodeJs
+          command: |
+            curl -fsSL https://deb.nodesource.com/setup_13.x | sudo -E bash -
+            sudo apt install -y nodejs
+      - run:
+          name: Install Ansible
+          command: |
+            # Your code here
+            sudo apt update
+            sudo apt install software-properties-common -y
+            sudo add-apt-repository --yes --update ppa:ansible/ansible
+            sudo apt install ansible -y
+      - run:
+          name: Install AWS CLI
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install 
+      - run:
           name: Get backend url
           command: |
-            export BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --filters "Name=tag:project,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" --output text)
+            # your code here
+            export BACKEND_IP=$(aws ec2 describe-instances \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --filter   Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7} \
+              --output text)
             export API_URL="http://${BACKEND_IP}:3030"
             echo "API_URL = ${API_URL}"
-            echo API_URL="http://${BACKEND_IP}:3030" >> frontend/.env
+            echo "API_URL=http://${BACKEND_IP}:3030" >> frontend/.env
             cat frontend/.env
       - run:
           name: Deploy frontend objects
           command: |
+            # your code here
             cd frontend
-            npm install
-            npm run build
-            # tar -czvf artifact-"${CIRCLE_WORKFLOW_ID:0:7}".tar.gz dist
+            sudo npm install
+            sudo npm run build
             aws s3 cp dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+      # Here's where you will add some code to rollback on failure 
       - destroy-environment
       - revert-migrations
-            #TODO: provide this S3 bucket url
   deploy-backend:
     docker:
       - image: cimg/base:stable
@@ -373,26 +428,53 @@ jobs:
             fi
       - destroy-environment
       - revert-migrations
+  # cloudfront-update:
+  #   docker:
+  #     - image: amazon/aws-cli
+  #   steps:
+  #     - checkout
+  #     - run:
+  #         name: Install dependencies
+  #         command: |
+  #           yum install python3 -y
+  #           yum install gzip tar curl -y
+  #     - attach_workspace:
+  #         at: ~/
+  #     - run:
+  #         name: Update cloudfront distribution
+  #         command: |
+  #           aws cloudformation deploy \
+  #            --template-file .circleci/files/cloudfront.yml \
+  #            --stack-name InitialStack \
+  #            --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
+  #            --tags project=udapeople
+  #     - destroy-environment
+  #     - revert-migrations
   cloudfront-update:
     docker:
+      # Docker image here that supports AWS CLI
       - image: amazon/aws-cli
     steps:
+      # Checkout code from git
       - checkout
-      - run:
-          name: Install dependencies
-          command: |
-            yum install python3 -y
-            yum install gzip tar curl -y
-      - attach_workspace:
-          at: ~/
       - run:
           name: Update cloudfront distribution
           command: |
+            # your code here
+            export OldWorkflowID=$(aws cloudformation list-exports \
+              --query "Exports[?Name==\`WorkflowID\`].Value" \
+              --no-paginate --output text)
+            echo $OldWorkflowID >> ~/OldWorkflowID.txt
+            cat ~/OldWorkflowID.txt
+            echo "----------updating cloudfront------------"
             aws cloudformation deploy \
-             --template-file .circleci/files/cloudfront.yml \
-             --stack-name InitialStack \
-             --parameter-overrides WorkflowID="udapeople-${CIRCLE_WORKFLOW_ID:0:7}" \
-             --tags project=udapeople
+              --template-file .circleci/files/cloudfront.yml \
+              --stack-name InitialStack \
+              --parameter-overrides WorkflowID=${CIRCLE_WORKFLOW_ID:0:7} \
+              --tags project=udapeople
+              echo Old Workflow ID: "$OldWorkflowID"
+              echo Current Workflow ID: "${CIRCLE_WORKFLOW_ID:0:7}" 
+      # Here's where you will add some code to rollback on failure
       - destroy-environment
       - revert-migrations
   cleanup:
